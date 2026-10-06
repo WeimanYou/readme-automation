@@ -1,0 +1,21 @@
+name: Validate README Markers
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-markers:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check for START and END markers
+        run: |
+          if grep -q "<!-- START_SECTION -->" README.md && grep -q "<!-- END_SECTION -->" README.md; then
+            echo "Markers are present. Validation passed."
+          else
+            echo "::error::README.md is missing the required automated markers!"
+            exit 1
+          fi
