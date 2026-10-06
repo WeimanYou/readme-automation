@@ -1,0 +1,28 @@
+name: Update README
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+
+      - name: Update README content
+        run: |
+          CURRENT_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          sed -i "/<!-- START_SECTION -->/,/<!-- END_SECTION -->/c\<!-- START_SECTION -->\nLast updated at: $CURRENT_DATE\n<!-- END_SECTION -->" README.md
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "[Automated] Update README with timestamp"
+          git push
